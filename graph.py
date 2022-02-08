@@ -25,6 +25,8 @@ class Graph:
         self.node_parity : list[int] = []
 
         self.nodes : list[Node] = []
+        self.odd_degree_nodes : list[Node] = []
+        self.even_degree_nodes : list[Node] = []
         
     def addNode(self, node : Node):
         self.nodes.append(node)
@@ -66,3 +68,9 @@ class Graph:
 
         for index, degree in enumerate(self.node_degree):
             self.node_parity[index] = 1 if degree % 2 == 0 else 0
+        
+        for node in self.nodes:
+            if len(node.incident_edges) % 2 == 0:
+                self.even_degree_nodes.append(node)
+            else:
+                self.odd_degree_nodes.append(node)
