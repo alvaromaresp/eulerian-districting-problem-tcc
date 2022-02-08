@@ -1,5 +1,6 @@
 from graph import Graph
 from edge import Edge
+from node import Node
 
 def processFile(file, graph : Graph) -> None:
     for line in file:
@@ -28,14 +29,26 @@ def processFile(file, graph : Graph) -> None:
                 if (edge_info == 'demand'):
                     demand = getIntValueFromTitle(split, edge_info)
             
-            graph.addEdge(Edge(
+            org = Node(int(nodes[0]))
+            dst = Node(int(nodes[1]))
+
+            edge = Edge(
                 int(nodes[0]),
                 int(nodes[1]),
                 cost,
                 demand
-            ))
+            )
 
-            graph.setN_Nodes()
+            #Are we considering arcs?
+            org.addIncidentEdge(edge)
+            dst.addIncidentEdge(edge)
+
+            graph.addNode(org)
+            graph.addNode(dst)
+            graph.addEdge(edge)
+
+
+            graph.setNodeDegree()
             graph.setNodeParity()
 
 def getIntValueFromTitle(line : list[str], title : str) -> int:

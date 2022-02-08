@@ -1,4 +1,5 @@
 from edge import Edge
+from node import Node
 import functools
 
 class Depot:
@@ -22,7 +23,11 @@ class Graph:
 
         self.node_degree : list[int] = []
         self.node_parity : list[int] = []
+
+        self.nodes : list[Node] = []
         
+    def addNode(self, node : Node):
+        self.nodes.append(node)
 
     def addEdge(self, edge: Edge): 
         self.edges.append(edge)
@@ -48,8 +53,8 @@ class Graph:
     def setNodeDegree(self):
         self.node_degree = [0] * self.n_nodes
         for e in self.edges:
-            self.node_degree[e.org] = self.node_degree[e.org] + 1
-            self.node_degree[e.dst] = self.node_degree[e.dst] + 1
+            self.node_degree[e.org - 1] = self.node_degree[e.org - 1] + 1
+            self.node_degree[e.dst - 1] = self.node_degree[e.dst - 1] + 1
 
         self.bigM = functools.reduce(lambda acc, actual : acc if acc > actual else actual, self.node_degree)
 
@@ -59,5 +64,5 @@ class Graph:
 
         self.node_parity = [0] * self.n_nodes
 
-        for (index, degree) in self.node_degree:
+        for index, degree in enumerate(self.node_degree):
             self.node_parity[index] = 1 if degree % 2 == 0 else 0

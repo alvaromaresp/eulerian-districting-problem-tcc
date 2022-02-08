@@ -44,24 +44,33 @@ tau_2 = 0.10
 m = Model(sense=MINIMIZE, solver_name=CBC)
 
 # 1
-x = [[m.add_var(var_type=BINARY) for e in graph.edges] for p in graph.depots]
+x_pe = [[m.add_var(var_type=BINARY) for e in graph.edges] for p in graph.depots]
+w_pi = [[m.add_var(var_type=BINARY) for i in graph.nodes] for p in graph.depots]
 
 
 # 2
-for (e, _) in enumerate(graph.edges):
-    m += xsum(x[p][e] for (p, _) in enumerate(graph.depots)) == 1
+for e in enumerate(graph.edges):
+    m += xsum(x_pe[p][e] for p in enumerate(graph.depots)) == 1
 
 
 # 4
-for (p, _) in graph.depots:
-    m += xsum(e.demand * x[p][e] for (e, _) in graph.edges) <= d_*(1 + tau_1) 
+for p in enumerate(graph.depots):
+    m += xsum(e.demand * x_pe[p][e] for e in enumerate(graph.edges)) <= d_*(1 + tau_1) 
 
 # 5
-for (p, _) in graph.depots:
-    m += xsum(e.demand * x[p][e] for (e, _) in graph.edges) >= d_*(1 - tau_1) 
+for p in enumerate(graph.depots):
+    m += xsum(e.demand * x_pe[p][e] for e in enumerate(graph.edges)) >= d_*(1 - tau_1) 
 
+# 6
+for p in enumerate(graph.depots):
+    for i in graph.nodes:
+        m += xsum(x_pe[p][e] for e in i.incident_edges) <= graph.bigM * w_pi[p][i]
 
-#6
+#7
+for p in enumerate(graph.depots):
+    for i in graph.nodes:
+        m += xsum(x_pe[p][e] for e in i.incident_edges) >= w_pi[p][i]
+
 
 
 
