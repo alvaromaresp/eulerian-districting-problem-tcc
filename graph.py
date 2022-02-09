@@ -1,6 +1,9 @@
 from edge import Edge
 from node import Node
+
 import functools
+import networkx as nx 
+import matplotlib.pyplot  as plt
 
 class Depot:
     def __init__(self, node) -> None:
@@ -12,6 +15,8 @@ class Depot:
 
 
 class Graph:
+
+    G = nx.Graph()
 
     def __init__(self):
         self.n_nodes : int = None
@@ -29,10 +34,18 @@ class Graph:
         self.even_degree_nodes : list[Node] = []
         
     def addNode(self, node : Node):
-        self.nodes.append(node)
+        if node.id not in list(map(lambda n: n.id, self.nodes)):
+            self.nodes.append(node)
+        else:
+            for i in self.nodes:
+                if i.id == node.id:
+                    for e in node.incident_edges:
+                        i.addIncidentEdge(e)
+                    
 
     def addEdge(self, edge: Edge): 
         self.edges.append(edge)
+        self.G.add_edge(edge.org, edge.dst)
 
     def setN_Nodes(self, n_nodes : int):
         self.n_nodes = n_nodes
@@ -74,3 +87,17 @@ class Graph:
                 self.even_degree_nodes.append(node)
             else:
                 self.odd_degree_nodes.append(node)
+
+            node.degree = len(node.incident_edges)
+
+    def printGraph(self):
+        pos = nx.spring_layout(self.G, seed=225) 
+        nx.draw(self.G, pos, with_labels = True)
+        plt.show()
+
+    def getShortestPathLen(self, org, dst):
+        return len(nx.shortest_path(self.G, org, dst))
+    
+    def getShortestPathEdgeLen(self, edge : Edge, depot : Depot):
+        return min(self.getShortestPathLen(edge.org, depot.node),
+                   self.getShortestPathEdgeLen(edge.dst, depot.node))

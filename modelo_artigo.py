@@ -1,8 +1,5 @@
 from mip import Model, xsum, minimize, BINARY, INTEGER
 
-import networkx as nx
-import matplotlib.pyplot  as plt
-
 import sys
 
 from graph import Graph
@@ -28,25 +25,31 @@ graph.addDepot(1)
 graph.addDepot(2)
 graph.addDepot(3)
 
-G = nx.Graph()
 
-for e in graph.edges:
-    G.add_edge(e.org, e.dst)
+d_ = functools.reduce(lambda acc, actual : acc + (actual.demand if actual.demand != None else 0), graph.edges, 0) / len(graph.depots)
 
-pos = nx.spring_layout(G, seed=225) 
-nx.draw(G, pos, with_labels = True)
-plt.show()
-
-d_ = functools.reduce(lambda acc, actual : acc.demand + actual.demand, graph.edges) / len(graph.depots)
 tau_1 = 0.10
 tau_2 = 0.10
 
 m = Model(sense=MINIMIZE, solver_name=CBC)
 
-# 1
-x_pe = [[m.add_var(var_type=BINARY) for e in graph.edges] for p in graph.depots]
-w_pi = [[m.add_var(var_type=BINARY) for i in graph.nodes] for p in graph.depots]
+# Variáveis de decisão
+x_pe = [[m.add_var(var_type=BINARY) for _ in graph.edges] for _ in graph.depots]
+w_pi = [[m.add_var(var_type=BINARY) for _ in graph.nodes] for _ in graph.depots]
+z_ip_bin = [[m.add_var(var_type=BINARY) for _ in graph.nodes] for _ in graph.depots]
+z_ip = [[m.add_var(var_type=INTEGER) for _ in graph.nodes] for _ in graph.depots]
+r_i = [m.add_var(var_type=BINARY) for _ in graph.nodes]
 
+# 1
+
+m.objective = minimize(
+    xsum(
+        graph.getShortestPathEdgeLen(
+            graph.getShortestPathEdgeLen(edge, depot) *
+                x_pe[e][p] for e, edge in enumerate(graph.edges) for p, depot in enumerate(graph.depots)
+        )
+    )
+)
 
 # 2
 for e in enumerate(graph.edges):
