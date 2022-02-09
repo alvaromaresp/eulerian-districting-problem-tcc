@@ -66,38 +66,34 @@ for p in enumerate(graph.depots):
 
 # 6
 for p in enumerate(graph.depots):
-    for i in graph.nodes:
-        m += xsum(x_pe[p][e] for e in i.incident_edges) <= graph.bigM * w_pi[p][i]
+    for i, node in enumerate(graph.nodes):
+        m += xsum(x_pe[p][e] for e in node.incident_edges) <= graph.bigM * w_pi[p][i]
 
-#7
+# 7
 for p in enumerate(graph.depots):
     for i in graph.nodes:
         m += xsum(x_pe[p][e] for e in i.incident_edges) >= w_pi[p][i]
 
+# 8
+for p in enumerate(graph.depots):
+    for i, node in enumerate(graph.nodes):
+        m += xsum(x_pe[p][e] for e in node.incident_edges) == 2 * z_ip[p][i] + z_ip[p][i]
 
+# 9
+for i in graph.even_degree_nodes:
+    m += xsum(z_ip_bin[i.id - 1][p] for p in enumerate(graph.depots)) >= r_i[i.id - 1]
 
+# 10
+for i in graph.even_degree_nodes:
+    m += xsum(z_ip_bin[i.id - 1][p] for p in enumerate(graph.depots)) <= r_i[i.id - 1] * len(graph.depots)
 
-# m.objective = minimize(xsum(p[i] * x[i] for i in I))
+# 11
+for i in graph.odd_degree_nodes:
+    m += xsum(z_ip_bin[i.id - 1][p] for p in enumerate(graph.depots)) - 1 >= r_i[i.id - 1]
 
-# # m += xsum(w[i] * x[i] for i in I) <= c
+# 12
+for i in graph.odd_degree_nodes:
+    m += xsum(z_ip_bin[i.id - 1][p] for p in enumerate(graph.depots)) - 1 <= r_i[i.id - 1] * len(graph.depots)
 
-# m.optimize()
-
-# selected = [i for i in I if x[i].x >= 0.99]
-# print("selected items: {}".format(selected))
-
-# x = [[model.add_var(var_type=BINARY) for e in E] for p in P]     1
-
-# for e in E:
-#     model += xsum(x[p][e] for p in P) == 1    2
-
-# for p in P:
-#     model += xsum(d[e]*x[p][e] for e in E) <= D*(1+tau)      4
-
-# d[e] demanda do arco 
-
-# definir paridade dos vértices no pré-processamento
-# bpe menor caminho entre o menor caminho dos vértices
-
-
-# model.objective = minimize(xsum(b[p][e]*x[p][e] for p in P for e in E))
+# 13
+m += xsum(r_i[i] for i in enumerate(graph.nodes)) * (1/len(graph.nodes)) <= tau_2
