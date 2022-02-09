@@ -48,15 +48,15 @@ def processFile(file, graph : Graph) -> None:
             graph.addEdge(edge)
 
 
-            graph.setNodeDegree()
-            graph.setNodeParity()
+    graph.setNodeDegree()
+    graph.setNodeParity()
 
 def getIntValueFromTitle(line : list[str], title : str) -> int:
     value_index = line.index(title) + 1
     value = line[value_index]
     try :
         value = value.replace('\n', '')
-        return value
+        return int(value)
     except:
-        return value
+        return int(value)
 
