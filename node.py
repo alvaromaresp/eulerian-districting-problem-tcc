@@ -15,3 +15,7 @@ class Node:
             'Node: ' + str(self.id) + '\n' +
             '# of edges: ' + str(len(self.incident_edges)) + '\n' +
             'degree: ' + str(self.degree) + '\n')
+
+    def printEdges(self):
+        for e in self.incident_edges:
+            print(e)
