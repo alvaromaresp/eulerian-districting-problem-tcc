@@ -33,6 +33,7 @@ class Graph:
         self.odd_degree_nodes : list[Node] = []
         self.even_degree_nodes : list[Node] = []
         
+        self.depot_colors = []
     def addNode(self, node : Node):
         if node.id not in list(map(lambda n: n.id, self.nodes)):
             self.nodes.append(node)
@@ -65,6 +66,9 @@ class Graph:
     def addEdgeToDepotIndex(self, depot: int, edge : Edge):
         self.depots[depot - 1].addEdge(edge)
 
+    def setDepotColors(self, colors):
+        self.depot_colors = colors
+
     def setNodeDegree(self):
         self.node_degree = [0] * self.n_nodes
         for e in self.edges:
@@ -90,14 +94,25 @@ class Graph:
 
             node.degree = len(node.incident_edges)
 
-    def printGraph(self):
+    def printGraph(self, x_pe):
+        
         pos = nx.spring_layout(self.G, seed=225) 
-        nx.draw(self.G, pos, with_labels = True)
+        color_list = []
+
+        for e, _ in enumerate(self.edges):
+            color_list.append(self.getEdgeColorByDepot(x_pe, e))
+
+        nx.draw(self.G, pos, edge_color = tuple(color_list), with_labels = True)
         plt.show()
 
     def getShortestPathLen(self, org, dst):
-        return len(nx.shortest_path(self.G, org, dst))
+        return len(nx.shortest_path(self.G, org, dst)) - 2
     
     def getShortestPathEdgeLen(self, edge : Edge, depot : Depot):
         return min(self.getShortestPathLen(edge.org, depot.node),
-                   self.getShortestPathEdgeLen(edge.dst, depot.node))
+                   self.getShortestPathLen(edge.dst, depot.node))
+
+    def getEdgeColorByDepot(self, x_pe, edge):
+        for p, _ in enumerate(self.depots):
+            if x_pe[p][edge] == 1:
+                return self.depot_colors[p]
