@@ -1,3 +1,4 @@
+import random
 from graph import Graph
 from edge import Edge
 from node import Node
@@ -21,7 +22,7 @@ def processFile(file, graph : Graph) -> None:
         if (split[0][0] == '('):
             nodes = split[0][1:-1].split(',')
             cost : int = None
-            demand : int = None
+            demand : int = 0
 
             for edge_info in split:
                 if (edge_info == 'trav_cost' or edge_info == 'cost'):
@@ -40,14 +41,21 @@ def processFile(file, graph : Graph) -> None:
             )
 
             #Are we considering arcs?
-            org.addIncidentEdge(edge)
+            # org.addIncidentEdge(edge)
             dst.addIncidentEdge(edge)
 
             graph.addNode(org)
             graph.addNode(dst)
             graph.addEdge(edge)
 
+    graph.addDepot(1)
+    graph.addDepot(2)
+    graph.addDepot(3)
+    
+    colors = ["#"+''.join([random.choice('0123456789ABCDEF') for _ in range(6)])
+                    for _ in enumerate(graph.depots)]
 
+    graph.setDepotColors(colors)
     graph.setNodeDegree()
     graph.setNodeParity()
 
