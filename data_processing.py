@@ -30,10 +30,11 @@ def processFile(file, graph : Graph) -> None:
                 if (edge_info == 'demand'):
                     demand = getIntValueFromTitle(split, edge_info)
             
-            org = Node(int(nodes[0]))
-            dst = Node(int(nodes[1]))
+            org = Node(int(nodes[0]) - 1)
+            dst = Node(int(nodes[1]) - 1)
 
             edge = Edge(
+                len(graph.edges),
                 int(nodes[0]),
                 int(nodes[1]),
                 cost,
@@ -48,9 +49,9 @@ def processFile(file, graph : Graph) -> None:
             graph.addNode(dst)
             graph.addEdge(edge)
 
+    graph.addDepot(0)
     graph.addDepot(1)
     graph.addDepot(2)
-    graph.addDepot(3)
     
     colors = ["#"+''.join([random.choice('0123456789ABCDEF') for _ in range(6)])
                     for _ in enumerate(graph.depots)]
@@ -58,6 +59,7 @@ def processFile(file, graph : Graph) -> None:
     graph.setDepotColors(colors)
     graph.setNodeDegree()
     graph.setNodeParity()
+    graph.setAllShortestPaths()
 
 def getIntValueFromTitle(line : list[str], title : str) -> int:
     value_index = line.index(title) + 1

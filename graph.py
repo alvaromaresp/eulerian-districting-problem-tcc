@@ -17,6 +17,7 @@ class Depot:
 class Graph:
 
     G = nx.Graph()
+    distance_matrix = []
 
     def __init__(self):
         self.n_nodes : int = None
@@ -46,7 +47,11 @@ class Graph:
 
     def addEdge(self, edge: Edge): 
         self.edges.append(edge)
-        self.G.add_edge(edge.org, edge.dst)
+        cost = 0
+        if (edge.cost != 0):
+            cost = edge.cost
+
+        self.G.add_edge(edge.org, edge.dst, weight=cost)
 
     def setN_Nodes(self, n_nodes : int):
         self.n_nodes = n_nodes
@@ -104,15 +109,15 @@ class Graph:
 
         nx.draw(self.G, pos, edge_color = tuple(color_list), with_labels = True)
         plt.show()
-
-    def getShortestPathLen(self, org, dst):
-        return len(nx.shortest_path(self.G, org, dst)) - 2
     
     def getShortestPathEdgeLen(self, edge : Edge, depot : Depot):
-        return min(self.getShortestPathLen(edge.org, depot.node),
-                   self.getShortestPathLen(edge.dst, depot.node))
+        return min(self.distance_matrix[edge.org - 1][depot.node],
+                   self.distance_matrix[edge.dst - 1][depot.node])
 
     def getEdgeColorByDepot(self, x_pe, edge):
         for p, _ in enumerate(self.depots):
             if x_pe[p][edge] == 1:
                 return self.depot_colors[p]
+
+    def setAllShortestPaths(self):
+        self.distance_matrix = nx.floyd_warshall_numpy(self.G)
