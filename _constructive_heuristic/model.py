@@ -1,9 +1,9 @@
 import sys
 
-from graph import Graph
-from edge import Edge
+from state_of_the_art.graph import Graph
+from state_of_the_art.edge import Edge
 
-from data_processing import *
+from state_of_the_art.article_data_processing import *
 
 
 file = None

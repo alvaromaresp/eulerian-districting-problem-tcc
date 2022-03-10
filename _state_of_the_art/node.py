@@ -1,4 +1,4 @@
-from edge import Edge
+from .._abstracts.edge import Edge
 
 class Node:
     def __init__(self, id):

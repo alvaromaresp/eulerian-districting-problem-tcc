@@ -3,9 +3,8 @@ from mip import Model, xsum, minimize, BINARY, INTEGER, CBC
 import sys
 
 from graph import Graph
-from edge import Edge
 
-from data_processing import *
+from .._abstracts._data_processing import *
 
 import functools
 
@@ -24,8 +23,8 @@ processFile(file, graph)
 
 d_ = functools.reduce(lambda acc, actual : acc + (actual.demand if actual.demand != None else 0), graph.edges, 0) / len(graph.depots)
 
-tau_1 = 0.20
-tau_2 = 0.20
+tau_1 = 0.80
+tau_2 = 0.80
 
 m = Model(sense=minimize, solver_name=CBC)
 

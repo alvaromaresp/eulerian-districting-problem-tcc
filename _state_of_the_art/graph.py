@@ -1,20 +1,13 @@
-from edge import Edge
+from .._abstracts.edge import Edge
+from .._abstracts._graph import _Graph
 from node import Node
+from depot import Depot
 
 import functools
 import networkx as nx 
 import matplotlib.pyplot  as plt
 
-class Depot:
-    def __init__(self, node) -> None:
-        self.node = node
-        self.edges : list[Edge] = []
-
-    def addEdge(self, edge: Edge): 
-        self.edges.append(edge)
-
-
-class Graph:
+class Graph(_Graph):
 
     G = nx.Graph()
     distance_matrix = []
@@ -35,6 +28,7 @@ class Graph:
         self.even_degree_nodes : list[Node] = []
         
         self.depot_colors = []
+        
     def addNode(self, node : Node):
         if node.id not in list(map(lambda n: n.id, self.nodes)):
             self.nodes.append(node)
@@ -121,3 +115,48 @@ class Graph:
 
     def setAllShortestPaths(self):
         self.distance_matrix = nx.floyd_warshall_numpy(self.G)
+
+    def buildEdgeFromLine(self, split):
+        if (split[0][0] == '('):
+            nodes = split[0][1:-1].split(',')
+            cost : int = None
+            demand : int = 0
+
+            for edge_info in split:
+                if (edge_info == 'trav_cost' or edge_info == 'cost'):
+                    cost = self.getIntValueFromTitle(split, edge_info)
+                if (edge_info == 'demand'):
+                    demand = self.getIntValueFromTitle(split, edge_info)
+            
+            org = Node(int(nodes[0]) - 1)
+            dst = Node(int(nodes[1]) - 1)
+
+            edge = Edge(
+                len(self.edges),
+                int(nodes[0]),
+                int(nodes[1]),
+                cost,
+                demand
+            )
+
+            #Are we considering arcs?
+            # org.addIncidentEdge(edge)
+            dst.addIncidentEdge(edge)
+
+            self.addNode(org)
+            self.addNode(dst)
+            self.addEdge(edge)
+    
+    def getIntValueFromTitle(self, line : list[str], title : str) -> int:
+        value_index = line.index(title) + 1
+        value = line[value_index]
+        try :
+            value = value.replace('\n', '')
+            return int(value)
+        except:
+            return int(value)
+    
+    def prepareData(self):
+        self.setNodeDegree()
+        self.setNodeParity()
+        self.setAllShortestPaths()
