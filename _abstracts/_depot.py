@@ -1,11 +1,11 @@
 from typing import Dict
-from edge import Edge
+from _edge import _Edge
 
-class Depot():
+class _Depot():
     def __init__(self, node) -> None:
         self.node = node
-        self.edges : list[Edge] = []
+        self.edges : list[_Edge] = []
 
-    def addEdge(self, edge: Edge): 
+    def addEdge(self, edge: _Edge):
         self.edges.append(edge)
-        
+

@@ -1,13 +1,13 @@
-from .._abstracts.edge import Edge
+from .._abstracts._edge import _Edge
 
 class Node:
     def __init__(self, id):
         self.id : int = id
-        self.incident_edges : list[Edge] = []
+        self.incident_edges : list[_Edge] = []
         self.depot_parity : int = None
         self.degree : int = None
-    
-    def addIncidentEdge(self, edge):
+
+    def addIncidentEdge(self, edge : _Edge):
         self.incident_edges.append(edge)
 
     def __str__(self):

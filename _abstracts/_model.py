@@ -1,8 +1,8 @@
 
-import abc
+from abc import ABC, abstractmethod
 
-class Model(abc.ABCMeta):
+class _Model(ABC):
 
-    @abc.abstractmethod
-    def execute:
+    @abstractmethod
+    def execute(self):
         pass

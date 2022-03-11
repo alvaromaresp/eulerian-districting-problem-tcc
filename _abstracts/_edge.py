@@ -1,4 +1,4 @@
-class Edge:
+class _Edge:
 
     def __init__(self, id: int, org : int, dst : int, cost : int, demand : int):
         self.id: int = id
