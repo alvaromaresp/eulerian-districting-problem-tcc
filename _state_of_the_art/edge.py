@@ -1,9 +1,10 @@
-class _Edge:
+from .._abstracts._edge import _Edge
 
-    def __init__(self, id: int, org : int, dst : int, cost : int, demand : int):
-        self.id: int = id
-        self.cost : int = cost
-        self.demand : int = demand
+class Edge(_Edge):
+
+    def __init__(self, int, org : int, dst : int):
+        self.org : int = org
+        self.dst : int = dst
 
     def __str__(self):
         return (
