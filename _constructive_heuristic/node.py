@@ -9,3 +9,9 @@ class Node(_Node):
 
     def previewNodeParityInDistrict(self, depot_id : int):
         return 0 if self.district_parity.get(depot_id) == 1 else 0
+
+    def updateEdgeDepot(self, edge : Edge):
+        for e in self.edges:
+            if (e.id == edge.id):
+                e.depot_id = edge.depot_id
+                break

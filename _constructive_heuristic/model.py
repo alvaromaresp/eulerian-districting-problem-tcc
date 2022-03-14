@@ -10,8 +10,8 @@ class ConstructiveModel(_Model):
 
     def execute(self, graph : Graph):
         
-        for depot in graph.depots:
-            depot.
+        # for depot in graph.depots:
+        #     depot.
 
 
     
