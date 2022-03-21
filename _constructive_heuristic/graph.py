@@ -13,6 +13,7 @@ class Graph(_Graph):
     def __init__(self):
         self.depots : list[Depot] = []
         self.nodes : list[Node] = []
+        self.d_ : float = 0
         
     def addDepot(self, num_depot: int):
         self.depots.append(Depot(num_depot))
@@ -61,23 +62,36 @@ class Graph(_Graph):
             acc + actual.total_demand if actual.depot_id != depot_id else acc + actual.total_demand + edge.demand
         , self.depots)
 
-    def previewEdgeParityInDepots(self, edge : Edge, depot_id : int) -> float:
-        return functools.reduce(lambda acc, actual :
-            acc + actual.total_ if actual.depot_id != depot_id else acc + actual.total_demand + edge.demand
-        , self.depots)     
+    # def previewEdgeParityInDepots(self, edge : Edge, depot_id : int) -> float:
+    #     return functools.reduce(lambda acc, actual :
+    #         acc + actual.total_ if actual.depot_id != depot_id else acc + actual.total_demand + edge.demand
+    #     , self.depots)     
 
     def getNodeEdgesSortedByHeuristic(self, node : Node, depot : Depot) -> list[Edge]:
         return node.edges.sort(key= lambda edge :
             edge.demand + self.getShortestPathEdgeLen(edge, depot) +
-            edge.org.previewNodeParityInDistrict(depot.node)
+            edge.org.previewNodeParityInDistrict(depot.node) # REFAZER ESTA PARTE
         )
 
     def getNodeEdgesSortedByDemandEquilibrium(self, node : Node, depot : Depot) -> list[Edge]:
         return node.edges.sort(key=self.previewEdgeDemandInDepots)
 
 
-    def getNodeEdgesSortedByObjetiveFunction(self, node : Node, depot : Depot)  -> list[Edge]:
+    def getNodeEdgesSortedByShortestPath(self, node : Node, depot : Depot)  -> list[Edge]:
         return node.edges.sort(lambda edge : self.getShortestPathEdgeLen(edge, depot))
 
+    def setD_(self)  -> None:
+        self.d_ = functools.reduce(lambda acc, actual : 
+            acc + actual.demand, self.edges)
+        self.d_ = self.d_ / len(self.depots)
+
+    def isDemandBelowD_(self, tau_1: float) -> bool:
+        total_demand = functools.reduce(lambda acc, actual : 
+            acc + actual.total_demand, self.depots)
+        return total_demand <= self.d_ * (1 + tau_1) and total_demand >= self.d_ * (1 - tau_1) 
+
     def prepareData(self):
-        pass
+        self.setAllShortestPaths()
+        self.setNum_Nodes()
+        self.setDepotColors()
+        self.setD_()

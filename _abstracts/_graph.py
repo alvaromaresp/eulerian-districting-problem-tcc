@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from _depot import _Depot
-from _node import _Node
 from _edge import _Edge
 import networkx as nx
 
