@@ -6,7 +6,6 @@ class Edge(_Edge):
     def __init__(self, org : Node, dst : Node):
         self.org : Node = org
         self.dst : Node = dst
-        self.depot_id : int = None
 
     def __str__(self):
         return (

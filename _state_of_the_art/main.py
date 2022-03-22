@@ -1,4 +1,6 @@
 import sys
+
+from _constructive_heuristic.model import ConstructiveModel
 from .._abstracts._data_processing import DataProcessing
 from graph import Graph
 
@@ -13,6 +15,10 @@ def main():
     graph = Graph()
 
     DataProcessing.processFile(file, graph)
+
+    model = ConstructiveModel()
+
+    model.execute(graph)
 
 if __name__ == "__main__":
     main()

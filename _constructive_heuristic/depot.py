@@ -1,8 +1,6 @@
-from platform import node
 from typing import Dict
 
 from node import Node
-from .._abstracts._edge import _Edge
 from .._abstracts._depot import _Depot
 from edge import Edge
 
@@ -30,7 +28,7 @@ class Depot(_Depot):
     def addBorderEdge(self, edge: Edge):
         edge = self.addEdgeNodes(edge)
 
-        self.border_edges.update({ edge.dst, edge })
+        self.border_edges.update({ edge.dst.id, edge })
 
         if (edge.org in self.border_edges
             and not edge.dst in self.border_edges):
@@ -39,14 +37,12 @@ class Depot(_Depot):
 
     def calculateParity(self, edges : list[Edge], node_num : int) -> float:
         total_parity = 0
-        nodes : list[Node] = map(lambda e : e.org, edges)
-        nodes = nodes + (map(lambda e : e.dst, edges))
-        nodes = list(set(nodes))
 
-        for node in nodes:
-            total_parity = total_parity + node.previewNodeParityInDistrict(node_num)
-        
-        return total_parity / len(edges)
+        for node in self.nodes:
+            total_parity = total_parity + node.district_parity.get(node_num)
+
+        # REVISAR NÓ E ARESTAS NESTA FUNÇÃO
+        return total_parity / len(self.nodes)
 
     def previewEdgeParity(self, edge : Edge):
         parity = 0
@@ -58,7 +54,7 @@ class Depot(_Depot):
                 value = edge.dst.previewNodeParityInDistrict(self.node)
             else:
                 value = n.district_parity.get(self.node)
-            
+
             parity = parity + value
 
         return parity

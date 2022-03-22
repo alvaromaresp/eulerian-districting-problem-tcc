@@ -9,7 +9,7 @@ class DataProcessing:
 
         for i in range(num_depots):
             graph.addDepot(i)
-        
+
         colors = ["#"+''.join([random.choice('0123456789ABCDEF') for _ in range(num_depots)])
                         for _ in enumerate(graph.depots)]
 
@@ -18,7 +18,7 @@ class DataProcessing:
 
     def processLine(self, line : str, graph: _Graph):
         split = line.split(' ')
-        
+
         self.getNodeNumber(split, graph)
 
         graph.buildEdgeFromLine(split)

@@ -4,6 +4,7 @@ class _Edge:
         self.id: int = id
         self.cost : int = cost
         self.demand : int = demand
+        self.depot_id : int = -1
 
     def __str__(self):
         return (

@@ -9,15 +9,12 @@ class ConstructiveModel(_Model):
     def execute(self, graph : Graph):
 
         k = 2
-        
-        while graph.isDemandBelowD_(self, 0.1):
-            for depot in graph.depots:
-                for (_, value) in depot.border_edges:
-                    choosenEdges = graph.getNodeEdgesSortedByShortestPath(value.dst)
-                    choosenEdges = choosenEdges[:k] if k <= value.dst.degree else choosenEdges[:value.dst.degree]
-                    for e in choosenEdges:
-                        depot.addBorderEdge(e)
+        tau_1 = 0.1
 
-
-
-    
+        while graph.areAllDemandsInsideD_Range(tau_1) and graph.isThereEdgeWithNoDistrict():
+            depot = graph.getWorstNonBalancedDistrict(tau_1)
+            for (_, value) in depot.border_edges:
+                choosenEdges = graph.getNodeEdgesSortedByShortestPath(value.dst)
+                choosenEdges = choosenEdges[:k] if k <= value.dst.degree else choosenEdges[:value.dst.degree]
+                for e in choosenEdges:
+                    depot.addBorderEdge(e)
