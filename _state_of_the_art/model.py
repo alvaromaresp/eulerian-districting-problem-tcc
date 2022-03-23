@@ -1,13 +1,9 @@
 from mip import Model, xsum, minimize, BINARY, INTEGER, CBC
 
 from graph import Graph
-
-from .._abstracts._data_processing import *
-from .._abstracts._model import _Model
-
 import functools
 
-class SOTA_Model(_Model):
+class SOTA_Model():
 
     def execute(self, graph : Graph):
         d_ = functools.reduce(lambda acc, actual : acc + (actual.demand if actual.demand != None else 0), graph.edges, 0) / len(graph.depots)

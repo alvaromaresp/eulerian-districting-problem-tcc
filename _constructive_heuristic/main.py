@@ -1,5 +1,6 @@
 import sys
-from .._abstracts._data_processing import DataProcessing
+from model import ConstructiveModel
+from data_processing import processFile
 from graph import Graph
 
 def main():
@@ -12,7 +13,12 @@ def main():
 
     graph = Graph()
 
-    DataProcessing.processFile(file, graph)
+    processFile(file, graph, 4)
+
+    model = ConstructiveModel()
+
+    model.execute(graph)
+
 
 if __name__ == "__main__":
     main()

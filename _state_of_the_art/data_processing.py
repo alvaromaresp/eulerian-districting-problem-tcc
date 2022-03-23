@@ -1,8 +1,8 @@
 import random
-from .._abstracts._graph import _Graph
+from graph import Graph
 
 class DataProcessing:
-    def processFile(self, file, graph: _Graph, num_depots: int) -> None:
+    def processFile(self, file, graph: Graph, num_depots: int) -> None:
 
         for line in file:
             self.processLine(line, graph)
@@ -16,7 +16,7 @@ class DataProcessing:
         graph.setDepotColors(colors)
         graph.prepareData()
 
-    def processLine(self, line : str, graph: _Graph):
+    def processLine(self, line : str, graph: Graph):
         split = line.split(' ')
 
         self.getNodeNumber(split, graph)
@@ -24,7 +24,7 @@ class DataProcessing:
         graph.buildEdgeFromLine(split)
 
 
-    def getNodeNumber(self, split, graph: _Graph):
+    def getNodeNumber(self, split, graph: Graph):
         if (split[0] == "NODES"):
             n_nodes = split[2].replace('\n','')
             graph.setN_Nodes(int(n_nodes))

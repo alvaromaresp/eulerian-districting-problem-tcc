@@ -1,15 +1,14 @@
-from .._abstracts._edge import _Edge
-from node import Node
+class Edge():
 
-class Edge(_Edge):
-
-    def __init__(self, org : Node, dst : Node):
-        self.org : Node = org
-        self.dst : Node = dst
+    def __init__(self, id, org, dst, demand : int):
+        self.id: int = id
+        self.org = org
+        self.dst = dst
+        self.demand : int = demand
+        self.depot_id : int = -1
 
     def __str__(self):
         return (
             'N1: ' + str(self.org.id) + '\n' +
             'N2: ' + str(self.dst.id) + '\n' +
-            'cost: ' + str(self.cost) + '\n'
             'demand: ' + str(self.demand))

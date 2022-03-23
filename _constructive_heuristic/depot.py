@@ -1,21 +1,32 @@
+import random
 from typing import Dict
 
 from node import Node
-from .._abstracts._depot import _Depot
 from edge import Edge
 
-class Depot(_Depot):
-    def __init__(self) -> None:
+class Depot():
+    def __init__(self, initial_node : Node) -> None:
+        self.initial_node = initial_node
+        self.edges: list[Edge] = []
         self.border_edges : Dict[int, Edge] = {}
         self.total_demand : float = 0.0
         self.total_parity : float = 0.0
         self.nodes : list[Node] = []
+        self.addInitialEdge()
+
+
+    def addInitialEdge(self):
+        self.nodes.append(self.initial_node)
+        random_initial_edge = random.choice((self.nodes[0].edges))
+        self.border_edges.update({ random_initial_edge.id:  random_initial_edge})
 
     def addEdgeNodes(self, edge : Edge):
         if edge.org.id not in list(map(lambda n: n.id, self.nodes)):
+            print("Adding origin node")
             self.nodes.append(edge.org)
 
         if edge.dst.id not in list(map(lambda n: n.id, self.nodes)):
+            print("Adding destination node")
             self.nodes.append(edge.dst)
 
         edge.depot_id = self.node
@@ -28,7 +39,7 @@ class Depot(_Depot):
     def addBorderEdge(self, edge: Edge):
         edge = self.addEdgeNodes(edge)
 
-        self.border_edges.update({ edge.dst.id, edge })
+        self.border_edges.update({ edge.dst.id: edge })
 
         if (edge.org in self.border_edges
             and not edge.dst in self.border_edges):

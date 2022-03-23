@@ -1,7 +1,7 @@
 import sys
+from _state_of_the_art.model import SOTA_Model
 
-from _constructive_heuristic.model import ConstructiveModel
-from .._abstracts._data_processing import DataProcessing
+from data_processing import DataProcessing
 from graph import Graph
 
 def main():
@@ -16,7 +16,7 @@ def main():
 
     DataProcessing.processFile(file, graph)
 
-    model = ConstructiveModel()
+    model = SOTA_Model()
 
     model.execute(graph)
 

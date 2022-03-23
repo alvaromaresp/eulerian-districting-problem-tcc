@@ -1,17 +1,20 @@
 from edge import Edge
-from .._abstracts._graph import _Graph
 from node import Node
-from .._abstracts._depot import _Depot
+from depot import Depot
 
 import functools
 import networkx as nx
 import matplotlib.pyplot  as plt
 
-class Graph(_Graph):
+class Graph():
 
     def __init__(self):
+        self.num_nodes : int = None
+        self.edges: list[Edge] = []
+        self.G = nx.Graph()
+        self.distance_matrix = []
         self.vehicles : int = None
-        self.depots : list[_Depot] = []
+        self.depots : list[Depot] = []
         self.capacity : int = None
         self.bigM : int = None
 
@@ -23,6 +26,38 @@ class Graph(_Graph):
         self.even_degree_nodes : list[Node] = []
 
         self.depot_colors = []
+
+
+    def setNum_Nodes(self, num_nodes: int):
+        self.num_nodes = num_nodes
+
+    def setDepotColors(self, colors):
+        self.depot_colors = colors
+
+    def getIntValueFromTitle(self, line : list[str], title : str) -> int:
+        value_index = line.index(title) + 1
+        value = line[value_index]
+        try :
+            value = value.replace('\n', '')
+            return int(value)
+        except:
+            return int(value)
+
+
+    def addEdge(self, edge: Edge):
+        self.edges.append(edge)
+        cost = 0
+        if (edge.cost != 0):
+            cost = edge.cost
+
+        self.G.add_edge(edge.org, edge.dst, weight=cost)
+
+    def setAllShortestPaths(self):
+        self.distance_matrix = nx.floyd_warshall_numpy(self.G)
+
+    def getShortestPathEdgeLen(self, edge : Edge, depot : Depot):
+        return min(self.distance_matrix[edge.org - 1][depot.node],
+                   self.distance_matrix[edge.dst - 1][depot.node])
 
     def addNode(self, node : Node):
         if node.id not in list(map(lambda n: n.id, self.nodes)):
@@ -43,7 +78,7 @@ class Graph(_Graph):
         self.bigM = bigM
 
     def addDepot(self, depot: int):
-        self.depots.append(_Depot(depot))
+        self.depots.append(Depot(depot))
 
     def addEdgeToDepotIndex(self, depot: int, edge : Edge):
         self.depots[depot - 1].addEdge(edge)
@@ -130,7 +165,7 @@ class Graph(_Graph):
             self.addNode(dst)
             self.addEdge(edge)
 
-        
+
     def prepareData(self):
         self.setNodeDegree()
         self.setNodeParity()

@@ -3,8 +3,16 @@ from .._abstracts._node import _Node
 
 class Node(_Node):
     def __init__(self):
+        self.id : int = id
+        self.edges : list[Edge] = []
+        self.degree : int = 0
+
+
         self.depot_parity : int = None
         self.incident_edges : list[Edge] = []
+
+    def addEdge(self, edge : Edge):
+        self.edges.append(edge)
 
     def addIncidentEdge(self, edge : Edge):
         self.incident_edges.append(edge)

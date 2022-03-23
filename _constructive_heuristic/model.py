@@ -1,20 +1,15 @@
-from platform import node
 from graph import Graph
-
-from .._abstracts._data_processing import *
-from .._abstracts._model import _Model
-
-class ConstructiveModel(_Model):
+class ConstructiveModel():
 
     def execute(self, graph : Graph):
 
         k = 2
         tau_1 = 0.1
 
-        while graph.areAllDemandsInsideD_Range(tau_1) and graph.isThereEdgeWithNoDistrict():
+        while not graph.areAllDemandsInsideD_Range(tau_1) and graph.isThereEdgeWithNoDistrict():
             depot = graph.getWorstNonBalancedDistrict(tau_1)
-            for (_, value) in depot.border_edges:
-                choosenEdges = graph.getNodeEdgesSortedByShortestPath(value.dst)
-                choosenEdges = choosenEdges[:k] if k <= value.dst.degree else choosenEdges[:value.dst.degree]
+            for key  in depot.border_edges:
+                choosenEdges = graph.getNodeEdgesSortedByShortestPath(depot.border_edges[key].dst, depot.initial_node.id)
+                choosenEdges = choosenEdges[:k] if k <= depot.border_edges[key].dst.degree else choosenEdges[:depot.border_edges[key].dst.degree]
                 for e in choosenEdges:
                     depot.addBorderEdge(e)
