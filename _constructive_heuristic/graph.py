@@ -16,6 +16,7 @@ class Graph():
         self.edges: list[Edge] = []
         self.G = nx.Graph()
         self.distance_matrix = []
+        self.isThereEdgeWithNoDistrict = True
 
 
     def setNum_Nodes(self, num_nodes: int):
@@ -37,14 +38,17 @@ class Graph():
     def addEdge(self, edge: Edge):
         self.edges.append(edge)
 
-        self.G.add_edge(edge.org, edge.dst)
+        self.G.add_edge(edge.org.id, edge.dst.id)
 
     def setAllShortestPaths(self):
         self.distance_matrix = nx.floyd_warshall_numpy(self.G)
 
     def getShortestPathEdgeLen(self, edge : Edge, depot : int):
-        return min(self.distance_matrix[edge.org.id - 1][depot],
-                   self.distance_matrix[edge.dst.id - 1][depot])
+        return nx.shortest_path_length(self.G, source=edge.dst.id, target=depot)
+        # return min(nx.shortest_path_length(self.G, source=edge.org.id, target=depot),
+        #             nx.shortest_path_length(self.G, source=edge.dst.id, target=depot))
+        # return min(self.distance_matrix[edge.org.id - 1][depot],
+        #            self.distance_matrix[edge.dst.id - 1][depot])
 
 
     def addDepot(self, num_depot: int):
@@ -96,17 +100,26 @@ class Graph():
     #     , self.depots)
 
     def getNodeEdgesSortedByHeuristic(self, node : Node, depot : Depot) -> list[Edge]:
-        return node.edges.sort(key= lambda edge :
+        node.edges.sort(key= lambda edge :
             edge.demand + self.getShortestPathEdgeLen(edge, depot) +
             edge.org.previewNodeParityInDistrict(depot.node) # REFAZER ESTA PARTE
         )
+        return node.edges
 
     def getNodeEdgesSortedByDemandEquilibrium(self, node : Node, depot : Depot) -> list[Edge]:
-        return node.edges.sort(key=self.previewEdgeDemandInDepots)
-
+        node.edges.sort(key=self.previewEdgeDemandInDepots)
+        return node.edges
 
     def getNodeEdgesSortedByShortestPath(self, node : Node, depot : Depot)  -> list[Edge]:
-        return node.edges.sort(key=lambda edge : self.getShortestPathEdgeLen(edge, depot))
+        node.edges.sort(key=lambda edge : self.getShortestPathEdgeLen(edge, depot.initial_node.id))
+        return node.edges
+
+    def getNodeEdgesSortedByShortestPathAndDemand(self, node : Node, depot : Depot)  -> list[Edge]:
+        node.edges.sort(key=lambda edge : self.getShortestPathEdgeLen(edge, depot.initial_node.id) * -1 * edge.demand)
+        edges = node.edges
+        if self.isThereEdgeWithNoDistrict:
+            edges = list(filter(lambda e: e.depot_id == -1, edges))
+        return edges
 
     def setD_(self)  -> None:
         self.d_ = functools.reduce(lambda acc, actual :
@@ -121,15 +134,18 @@ class Graph():
     def isDemandInsideLimits(self, demand, tau_1):
         return demand <= self.d_ * (1 + tau_1) and demand >= self.d_ * (1 - tau_1)
 
-    def isThereEdgeWithNoDistrict(self) -> bool:
-        return -1 in list(map(lambda e: e.depot_id, self.edges))
+    def checklIfIfThereEdgeWithNoDistrict(self) -> bool:
+        self.isThereEdgeWithNoDistrict = -1 in list(map(lambda e: e.depot_id, self.edges))
+        print("There are edges with no district == " + str(self.isThereEdgeWithNoDistrict))
 
     def getWorstNonBalancedDistrict(self, tau_1):
-        if self.isThereEdgeWithNoDistrict():
-            self.depots.sort(key=lambda d : d.total_demand)
+        depots = list(filter(lambda d : d.canMyBorderIncrease(), self.depots))
+        depots = self.depots if len(depots) == 0 else depots
+        if self.isThereEdgeWithNoDistrict:
+            depots.sort(key=lambda d : d.total_demand)
         else:
-            self.depots.sort(key=lambda d : -1 * self.d_ * (1 + tau_1) - d.total_demand)
-        return self.depots[0]
+            depots.sort(key=lambda d : -1 * self.d_ * (1 + tau_1) - d.total_demand)
+        return depots[0]
 
     def getNodeById(self, node_id : int) -> Node:
         for n in self.nodes:
