@@ -37,3 +37,10 @@ class Node():
             lambda acc, edge :
             acc or edge.depot_id == -1
         , self.edges, True)
+    
+    def correctEdgesOrigin(self):
+        for e in self.edges:
+            if(e.dst.id == self.id):
+                dst = e.org
+                e.org = self
+                e.dst = dst

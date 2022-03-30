@@ -21,47 +21,50 @@ class Depot():
     def addInitialEdge(self):
         self.nodes.append(self.initial_node)
         random_initial_edge = random.choice((self.nodes[0].edges))
-        self.edges.append(random_initial_edge)
-        self.border_edges.update({ random_initial_edge.dst.id:  random_initial_edge})
-        self.border_edges.update({ random_initial_edge.org.id:  random_initial_edge})
-
-    def addEdgeNodes(self, edge : Edge):
-        node_id_list = list(map(lambda n: n.id, self.nodes))
-        if edge.org.id not in node_id_list:
-            print("Adding origin node " + str(edge.org.id))
-            self.nodes.append(edge.org)
-
-        if edge.dst.id not in node_id_list:
-            print("Adding destination node " + str(edge.dst.id))
-            self.nodes.append(edge.dst)
-
-        edge.depot_id = self.initial_node.id
-
-        edge.org.updateEdgeDepot(edge)
-        edge.dst.updateEdgeDepot(edge)
-        self.edges.append(edge)
-
-        return edge
+        self.addBorderEdge(random_initial_edge)
 
     def addBorderEdge(self, edge: Edge):
-        # BORDA TEM APENAS VÉRTICES COM ARESTAS NÃO SELECIONADAS OU ARESTAS FRONTEIRIÇAS
 
         edge = self.addEdgeNodes(edge)
 
         self.total_demand = self.total_demand + edge.demand
+        
+        if (not self.border_edges):
+            self.border_edges.update({ edge.org.id: edge })
+        else:
+            if (edge.org.id in self.border_edges):
+                self.border_edges.update({ edge.dst.id: edge })
 
-        self.border_edges.update({ edge.dst.id: edge })
-        self.border_edges.update({ edge.org.id: edge })
+                if (not edge.org.doIHaveEdgesWithNoDistrict()):
+                    self.border_edges.pop(edge.org.id)
+
+            else:
+                self.border_edges.update({ edge.org.id: edge })
+
+                if (not edge.dst.doIHaveEdgesWithNoDistrict()):
+                    self.border_edges.pop(edge.dst.id)
+
         print("Updating border with edge " + str(edge.id) + " with demand " + str(edge.demand))
-        time.sleep(1)
-        if (edge.org in self.border_edges
-            and not edge.dst in self.border_edges):
 
-            self.border_edges.pop(edge.org)
+    def addEdgeNodes(self, edge : Edge):
+        node_id_list = list(map(lambda n: n.id, self.nodes))
+        if edge.org.id not in node_id_list:
+            self.nodes.append(edge.org)
+
+        if edge.dst.id not in node_id_list:
+            self.nodes.append(edge.dst)
+
+        edge.depot_id = self.initial_node.id
+
+        self.edges.append(edge)
+        edge.org.updateNodeParityInDistrict()
+        edge.dst.updateNodeParityInDistrict()
+
+        return edge
+
 
     def updateBorder(self, edges: list[Edge]):
-        print("Number of edges selected = " + str(len(edges)))
-        time.sleep(1)
+        print("Updating depot " + str(self.initial_node.id) + " with " + str(len(edges)) + " edges")
         for e in edges:
             self.addBorderEdge(e)
 

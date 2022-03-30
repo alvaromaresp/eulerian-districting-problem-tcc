@@ -8,4 +8,4 @@ class Edge():
         self.depot_id : int = -1
 
     def __str__(self):
-        return '(' + str(self.org.id) + ',' + str(self.dst.id) + ')'
+        return '(' + str(self.org.id) + ',' + str(self.dst.id) + ') - DISTRICT: ' + str(self.depot_id)

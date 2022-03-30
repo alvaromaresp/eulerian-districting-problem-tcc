@@ -12,14 +12,11 @@ def processFile(file, graph: Graph, num_depots: int) -> None:
     #     node = graph.getNodeById(i + 1)
     #     graph.addDepot(node)
 
+
     graph.addDepot(graph.getNodeById(1))
     graph.addDepot(graph.getNodeById(graph.num_nodes - 1))
 
-    colors = ["#"+''.join([random.choice('0123456789ABCDEF') for _ in range(num_depots)])
-                    for _ in enumerate(graph.depots)]
-
-    for i, c in enumerate(colors):
-        graph.depots[i].color = c
+    setDepotColors(graph)
 
     graph.prepareData()
 
@@ -65,8 +62,15 @@ def buildEdgeFromLine(split: str, graph : Graph):
         )
 
         org.addEdge(edge)
-        dst.addEdge(edge)
+        # dst.addEdge(edge)
 
         graph.addNode(org)
         graph.addNode(dst)
-        graph.addEdge(edge)
+        # graph.addEdge(edge)
+
+def setDepotColors(graph):
+    colors = ["#"+''.join([random.choice('0123456789ABCDEF') for _ in range(6)])
+                    for _ in enumerate(graph.depots)]
+
+    for i, c in enumerate(colors):
+        graph.depots[i].color = c
