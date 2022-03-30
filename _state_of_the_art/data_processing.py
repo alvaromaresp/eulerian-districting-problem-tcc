@@ -10,7 +10,7 @@ class DataProcessing:
         for i in range(num_depots):
             graph.addDepot(i)
 
-        colors = ["#"+''.join([random.choice('0123456789ABCDEF') for _ in range(num_depots)])
+        colors = ["#"+''.join([random.choice('0123456789ABCDEF') for _ in range(6)])
                         for _ in enumerate(graph.depots)]
 
         graph.setDepotColors(colors)
