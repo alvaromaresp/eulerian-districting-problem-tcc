@@ -8,7 +8,4 @@ class Edge():
         self.depot_id : int = -1
 
     def __str__(self):
-        return (
-            'N1: ' + str(self.org.id) + '\n' +
-            'N2: ' + str(self.dst.id) + '\n' +
-            'demand: ' + str(self.demand))
+        return '(' + str(self.org.id) + ',' + str(self.dst.id) + ')'

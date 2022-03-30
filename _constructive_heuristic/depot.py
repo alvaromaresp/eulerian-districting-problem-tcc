@@ -15,12 +15,15 @@ class Depot():
         self.total_parity : float = 0.0
         self.nodes : list[Node] = []
         self.addInitialEdge()
+        self.color = ''
 
 
     def addInitialEdge(self):
         self.nodes.append(self.initial_node)
         random_initial_edge = random.choice((self.nodes[0].edges))
-        self.border_edges.update({ random_initial_edge.id:  random_initial_edge})
+        self.edges.append(random_initial_edge)
+        self.border_edges.update({ random_initial_edge.dst.id:  random_initial_edge})
+        self.border_edges.update({ random_initial_edge.org.id:  random_initial_edge})
 
     def addEdgeNodes(self, edge : Edge):
         node_id_list = list(map(lambda n: n.id, self.nodes))
@@ -41,11 +44,14 @@ class Depot():
         return edge
 
     def addBorderEdge(self, edge: Edge):
+        # BORDA TEM APENAS VÉRTICES COM ARESTAS NÃO SELECIONADAS OU ARESTAS FRONTEIRIÇAS
+
         edge = self.addEdgeNodes(edge)
 
         self.total_demand = self.total_demand + edge.demand
 
         self.border_edges.update({ edge.dst.id: edge })
+        self.border_edges.update({ edge.org.id: edge })
         print("Updating border with edge " + str(edge.id) + " with demand " + str(edge.demand))
         time.sleep(1)
         if (edge.org in self.border_edges
@@ -89,5 +95,7 @@ class Depot():
     def canMyBorderIncrease(self):
         return functools.reduce(
             lambda acc, edge :
-            acc and edge.depot_id == -1
-        , self.border_edges.values(), True)
+            acc or edge.dst.doIHaveEdgesWithNoDistrict() or edge.org.doIHaveEdgesWithNoDistrict()
+        , self.border_edges.values(), False)
+
+    

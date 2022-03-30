@@ -1,3 +1,4 @@
+import functools
 from typing import Dict
 from edge import Edge
 
@@ -27,6 +28,12 @@ class Node():
         for edge in self.edges:
             if edge.depot_id in self.district_parity:
                 actual_parity = self.district_parity.get(edge.depot_id)
-                self.district_parity.update({ edge.depot_id: actual_parity + 1 })
+                self.district_parity.update({ edge.depot_id: 1 if actual_parity == 0 else 0 })
             else:
                 self.district_parity.update({ edge.depot_id: 1 })
+
+    def doIHaveEdgesWithNoDistrict(self):
+        return functools.reduce(
+            lambda acc, edge :
+            acc or edge.depot_id == -1
+        , self.edges, True)
