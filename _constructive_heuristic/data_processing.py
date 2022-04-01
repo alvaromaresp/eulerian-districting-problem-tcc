@@ -14,10 +14,12 @@ def processFile(file, graph: Graph, num_depots: int) -> None:
 
 
     graph.addDepot(graph.getNodeById(1))
+    graph.addDepot(graph.getNodeById(5))
+    graph.addDepot(graph.getNodeById(18))
     graph.addDepot(graph.getNodeById(graph.num_nodes - 1))
 
     setDepotColors(graph)
-
+    
     graph.prepareData()
 
 def processLine(line : str, graph: Graph):
@@ -54,6 +56,9 @@ def buildEdgeFromLine(split: str, graph : Graph):
         org = Node(int(nodes[0]) - 1)
         dst = Node(int(nodes[1]) - 1)
 
+        if (demand > graph.highestDemand):
+            graph.highestDemand = demand
+
         edge = Edge(
             len(graph.edges),
             org,
@@ -61,12 +66,12 @@ def buildEdgeFromLine(split: str, graph : Graph):
             demand
         )
 
-        org.addEdge(edge)
+        # org.addEdge(edge)
         # dst.addEdge(edge)
 
-        graph.addNode(org)
-        graph.addNode(dst)
-        # graph.addEdge(edge)
+        # graph.addNode(org)
+        # graph.addNode(dst)
+        graph.addEdge(edge)
 
 def setDepotColors(graph):
     colors = ["#"+''.join([random.choice('0123456789ABCDEF') for _ in range(6)])
