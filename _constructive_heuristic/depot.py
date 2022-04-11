@@ -33,6 +33,7 @@ class Depot():
             self.border_edges.update({ edge.org.id: edge })
         else:
             if (edge.org.id in self.border_edges):
+
                 self.border_edges.update({ edge.dst.id: edge })
 
                 if (not edge.org.doIHaveEdgesWithNoDistrict()):
@@ -41,10 +42,12 @@ class Depot():
             else:
                 self.border_edges.update({ edge.org.id: edge })
 
-                if (not edge.dst.doIHaveEdgesWithNoDistrict()):
+                if (not edge.dst.doIHaveEdgesWithNoDistrict() 
+                    and edge.dst.id in self.border_edges):
+
                     self.border_edges.pop(edge.dst.id)
 
-        print("Updating border with edge " + str(edge.id) + " with demand " + str(edge.demand))
+        # print("Updating border with edge " + str(edge.id) + " with demand " + str(edge.demand))
 
     def addEdgeNodes(self, edge : Edge):
         node_id_list = list(map(lambda n: n.id, self.nodes))
@@ -57,25 +60,17 @@ class Depot():
         edge.depot_id = self.initial_node.id
 
         self.edges.append(edge)
-        edge.org.updateNodeParityInDistrict()
-        edge.dst.updateNodeParityInDistrict()
+        edge.org.setParityInDistrict(edge.depot_id)
+        edge.dst.setParityInDistrict(edge.depot_id)
 
         return edge
 
 
     def updateBorder(self, edges: list[Edge]):
-        print("Updating depot " + str(self.initial_node.id) + " with " + str(len(edges)) + " edges")
+        # print("Updating depot " + str(self.initial_node.id) + " with " + str(len(edges)) + " edges")
         for e in edges:
             self.addBorderEdge(e)
 
-    def calculateParity(self, edges : list[Edge], node_num : int) -> float:
-        total_parity = 0
-
-        for node in self.nodes:
-            total_parity = total_parity + node.district_parity.get(node_num)
-
-        # REVISAR NÓ E ARESTAS NESTA FUNÇÃO
-        return total_parity / len(self.nodes)
 
     def previewEdgeParity(self, edge : Edge):
         parity = 0
@@ -91,9 +86,6 @@ class Depot():
             parity = parity + value
 
         return parity
-
-    def updateParity(self):
-        self.total_parity = self.calculateParity(self.edges, self.node)
 
     def canMyBorderIncrease(self):
         return functools.reduce(

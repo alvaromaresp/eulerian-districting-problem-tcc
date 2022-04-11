@@ -14,15 +14,19 @@ class Node():
         self.degree = self.degree + 1
 
     def previewNodeParityInDistrict(self, depot_id : int):
-        return 0 if self.district_parity.get(depot_id) == 1 else 0
+        return 1 if depot_id in self.district_parity and self.district_parity.get(depot_id) == 0 else 0
 
-    def updateEdgeDepot(self, edge : Edge):
-        for e in self.edges:
-            if (e.id == edge.id):
-                e.depot_id = edge.depot_id
-                break
-        self.updateNodeParityInDistrict()
-        print("Node " + str(self.id) + " has parity " + str(self.district_parity.get(edge.depot_id)) + " in district " + str(edge.depot_id))
+    def setParityInDistrict(self, depot_id : int):
+        if depot_id in self.district_parity and self.district_parity.get(depot_id) == 0:
+            self.district_parity.update({ depot_id: 1 })
+        else:
+            self.district_parity.update({ depot_id: 0 })
+
+    def getParityInDistrict(self, depot_id : int):
+        if depot_id in self.district_parity:
+            return self.district_parity.get(depot_id)
+        else:
+            return 0
 
     def updateNodeParityInDistrict(self):
         self.district_parity.clear()
@@ -37,11 +41,11 @@ class Node():
         return functools.reduce(
             lambda acc, edge :
             acc or edge.depot_id == -1
-        , self.edges, True)
+        , self.edges, False)
     
     
     def calculateLostParity(self):
-        list_of_odd_districts = list(filter(lambda parity: parity == 1, self.district_parity.values()))
+        list_of_odd_districts = list(filter(lambda parity: parity == 0, self.district_parity.values()))
         if (self.degree % 2 == 0):
             return 1 if len(list_of_odd_districts) != 0 else 0
         else:

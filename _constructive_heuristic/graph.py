@@ -87,23 +87,39 @@ class Graph():
         return min(nx.shortest_path_length(self.G, source=edge.org.id, target=depot),
                     nx.shortest_path_length(self.G, source=edge.dst.id, target=depot))
 
-    def getNodeEdgesSortedByShortestPathAndDemand(self, edge : Edge, depot_id : int)  -> list[Edge]:
+    def getNodeEdgesSortedByHeuristic(self, edge : Edge, depot_id : int)  -> list[Edge]:
         # print("Border edge chosen: " + str(edge))
         candidateEdges = edge.org.edges + edge.dst.edges
         candidateEdges.sort(key=
-            lambda e : self.getShortestPathEdgeLen(e, depot_id)/self.highestDistance - edge.demand/self.highestDemand)
-
-        candidateEdges = list(filter(lambda e: e.id != edge.id, candidateEdges))
+            lambda e : self.getShortestPathEdgeLen(e, depot_id)/self.highestDistance - e.demand/self.highestDemand - edge.previewNodesParityInDistrict(depot_id))
         
-        # print("Candidate edges length: " + str(len(edge.org.edges)))
-        if self.areThereEdgesWithNoDistrict:
-            candidateEdges = list(filter(lambda e: e.depot_id == -1, candidateEdges))
-            # print("Candidate edges length if there is edges with no district: " + str(len(candidateEdges)))
-        else:
-            candidateEdges = list(filter(lambda e: e.depot_id == depot_id, candidateEdges))
-            # print("Candidate edges length if there is no edges with no district: " + str(len(candidateEdges)))
+        candidateEdges = list(filter(lambda e: e.depot_id == -1 and e.id != edge.id, candidateEdges))
         return candidateEdges
 
+    def getNodeEdgesSortedByDemand(self, edge : Edge, depot_id : int)  -> list[Edge]:
+        candidateEdges = edge.org.edges + edge.dst.edges
+        candidateEdges = list(filter(lambda e: e.depot_id == -1 and e.id != edge.id, candidateEdges))
+
+        candidateEdges.sort(key=lambda e : e.demand, reverse=True)
+
+        edgesWithEqualDemand = []
+        for e in candidateEdges:
+            if e.demand == candidateEdges[0].demand:
+                edgesWithEqualDemand.append(e)
+        
+        if (len(edgesWithEqualDemand) > 1):
+            return edgesWithEqualDemand.sort(key = lambda e : self.getShortestPathEdgeLen(e, depot_id))
+        
+        
+        return candidateEdges
+
+    def getNodeEdgesSortedByObjectiveFuncion(self, edge : Edge, depot_id : int)  -> list[Edge]:
+        candidateEdges = edge.org.edges + edge.dst.edges
+        candidateEdges = list(filter(lambda e: e.depot_id == -1 and e.id != edge.id, candidateEdges))
+
+        candidateEdges.sort(key = lambda e : self.getShortestPathEdgeLen(e, depot_id))
+
+        return candidateEdges
 
     def areAllDemandsInsideD_Range(self, tau_1: float) -> bool:
         return functools.reduce(lambda acc, actual :
@@ -117,17 +133,12 @@ class Graph():
         # print("There are edges with no district == " + str(self.areThereEdgesWithNoDistrict))
 
     def getWorstNonBalancedDistrict(self, tau_1):
-        depots = list(filter(lambda d : d.canMyBorderIncrease(), self.depots))
-        if len(depots) == 0:
-            return None
         if not self.areAllDemandsInsideD_Range(tau_1):
-            depots.sort(key=lambda d : d.total_demand)
-            print("Depots sorted outside range")
-            print(list(map(lambda d : d.total_demand, depots)))
+            self.depots.sort(key=lambda d : d.total_demand)
         else:
-            depots.sort(key=lambda d : self.d_ * (1 + tau_1) - d.total_demand, reverse=True) ## MAIOR DISTÂNCIA DO UPPER BOUND
-            print("Depots sorted inside range")
-            print(list(map(lambda d : d.total_demand, depots)))
+            self.depots.sort(key=lambda d : self.d_ * (1 + tau_1) - d.total_demand, reverse=True) ## MAIOR DISTÂNCIA DO UPPER BOUND
+        
+        depots = list(filter(lambda d : d.canMyBorderIncrease(), self.depots))
         return depots[0]
 
     def printGraph(self):
@@ -135,7 +146,6 @@ class Graph():
 
         for depot in self.depots:
             depot_edges = list(map(lambda e: (e.org.id, e.dst.id), depot.edges))
-            print(depot_edges)
             nx.draw_networkx_edges(self.G, pos, depot_edges, edge_color= depot.color)
 
         edges_with_no_depot = list(map(lambda e:  (e.org.id, e.dst.id),filter(lambda e : e.depot_id == -1, self.edges)))
@@ -144,3 +154,12 @@ class Graph():
         nx.draw_networkx_labels(self.G, pos)
 
         plt.show()
+
+    def runDiagnostics(self, tau_1, actual_depot: Depot):
+        print("Are all demands inside range? " + str(self.areAllDemandsInsideD_Range(tau_1)))
+        print("Are there edges without districts? " + str(self.areThereEdgesWithNoDistrict))
+        print("Depots demands: ")
+        print(list(map(lambda d : d.total_demand, self.depots)))
+        print("Depot chosen before exception: " + str(actual_depot.initial_node.id))
+        
+        self.printGraph()

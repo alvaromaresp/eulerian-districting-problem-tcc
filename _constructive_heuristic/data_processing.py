@@ -12,7 +12,6 @@ def processFile(file, graph: Graph, num_depots: int) -> None:
     #     node = graph.getNodeById(i + 1)
     #     graph.addDepot(node)
 
-
     graph.addDepot(graph.getNodeById(1))
     graph.addDepot(graph.getNodeById(5))
     graph.addDepot(graph.getNodeById(18))
