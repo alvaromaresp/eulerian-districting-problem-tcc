@@ -1,7 +1,7 @@
 import sys
-from _state_of_the_art.model import SOTA_Model
+from model import SOTA_Model
 
-from data_processing import DataProcessing
+from data_processing import processFile
 from graph import Graph
 
 def main():
@@ -14,8 +14,9 @@ def main():
 
     graph = Graph()
 
-    DataProcessing.processFile(file, graph)
-
+    processFile(file, graph)
+    
+    print(graph.G.nodes())
     model = SOTA_Model()
 
     model.execute(graph)

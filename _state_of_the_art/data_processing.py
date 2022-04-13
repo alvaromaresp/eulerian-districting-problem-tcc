@@ -1,31 +1,65 @@
 import random
+from edge import Edge
+from node import Node
 from graph import Graph
 
-class DataProcessing:
-    def processFile(self, file, graph: Graph, num_depots: int) -> None:
+def processFile(file, graph: Graph, num_depots: int = 3) -> None:
 
-        for line in file:
-            self.processLine(line, graph)
+    for line in file:
+        processLine(line, graph)
 
-        for i in range(num_depots):
-            graph.addDepot(i)
+    for i in range(num_depots):
+        graph.addDepot(i)
 
-        colors = ["#"+''.join([random.choice('0123456789ABCDEF') for _ in range(6)])
-                        for _ in enumerate(graph.depots)]
+    colors = ["#"+''.join([random.choice('0123456789ABCDEF') for _ in range(6)])
+                    for _ in enumerate(graph.depots)]
 
-        graph.setDepotColors(colors)
-        graph.prepareData()
+    graph.setDepotColors(colors)
+    prepareData(graph)
 
-    def processLine(self, line : str, graph: Graph):
-        split = line.split(' ')
+def processLine(line : str, graph: Graph):
+    split = line.split(' ')
 
-        self.getNodeNumber(split, graph)
+    getNodeNumber(split, graph)
 
-        graph.buildEdgeFromLine(split)
+    buildEdgeFromLine(graph, split)
 
 
-    def getNodeNumber(self, split, graph: Graph):
-        if (split[0] == "NODES"):
-            n_nodes = split[2].replace('\n','')
-            graph.setN_Nodes(int(n_nodes))
+def getNodeNumber(split, graph: Graph):
+    if (split[0] == "NODES"):
+        n_nodes = split[2].replace('\n','')
+        graph.setNum_Nodes(int(n_nodes))
 
+def getIntValueFromTitle(line : list[str], title : str) -> int:
+    value_index = line.index(title) + 1
+    value = line[value_index]
+    try :
+        value = value.replace('\n', '')
+        return int(value)
+    except:
+        return int(value)
+
+
+def buildEdgeFromLine(graph: Graph, split):
+    if (split[0][0] == '('):
+        nodes = split[0][1:-1].split(',')
+        demand : int = 0
+
+        for edge_info in split:
+            if (edge_info =='demand'):
+                demand = getIntValueFromTitle(split, edge_info)
+
+        edge = Edge(
+            len(graph.edges),
+            int(nodes[0]),
+            int(nodes[1]),
+            demand
+        )
+
+        graph.addEdge(edge)
+
+
+def prepareData(graph: Graph):
+    graph.setNodeDegree()
+    graph.setNodeParity()
+    graph.setAllShortestPaths()

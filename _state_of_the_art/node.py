@@ -1,27 +1,21 @@
 from edge import Edge
-from .._abstracts._node import _Node
 
-class Node(_Node):
-    def __init__(self):
+class Node():
+    def __init__(self, id):
         self.id : int = id
         self.edges : list[Edge] = []
         self.degree : int = 0
 
-
-        self.depot_parity : int = None
-        self.incident_edges : list[Edge] = []
-
     def addEdge(self, edge : Edge):
         self.edges.append(edge)
-
-    def addIncidentEdge(self, edge : Edge):
-        self.incident_edges.append(edge)
+        self.degree = self.degree + 1
 
     def __str__(self):
         return (
             'Node: ' + str(self.id) + '\n' +
-            '# of edges: ' + str(len(self.incident_edges)) + '\n')
+            '# of edges: ' + str(len(self.edges)) + '\n' +
+            'Degree: ' + str(self.degree) + '\n')
 
     def printEdges(self):
-        for e in self.incident_edges:
+        for e in self.edges:
             print(e)

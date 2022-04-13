@@ -49,17 +49,17 @@ class SOTA_Model():
         # 6
         for p, _ in enumerate(graph.depots):
             for i in graph.nodes:
-                m += xsum(x_pe[p][e.id] for _ , e in enumerate(i.incident_edges)) <= graph.bigM * w_pi[p][i.id], "CONSTRAINT_6"
+                m += xsum(x_pe[p][e.id] for _ , e in enumerate(i.edges)) <= graph.bigM * w_pi[p][i.id], "CONSTRAINT_6"
 
         # 7
         for p, _ in enumerate(graph.depots):
             for i in graph.nodes:
-                m += xsum(x_pe[p][e.id] for _ , e in enumerate(i.incident_edges)) >= w_pi[p][i.id], "CONSTRAINT_7"
+                m += xsum(x_pe[p][e.id] for _ , e in enumerate(i.edges)) >= w_pi[p][i.id], "CONSTRAINT_7"
 
         # 8
         for p, _ in enumerate(graph.depots):
             for i in graph.nodes:
-                m += xsum(x_pe[p][e.id] for _ , e in enumerate(i.incident_edges)) == 2 * z_ip[p][i.id] + z_ip[p][i.id], "CONSTRAINT_8"
+                m += xsum(x_pe[p][e.id] for _ , e in enumerate(i.edges)) == 2 * z_ip[p][i.id] + z_ip[p][i.id], "CONSTRAINT_8"
 
         # 9
         for i in graph.even_degree_nodes:
