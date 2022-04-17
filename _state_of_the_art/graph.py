@@ -87,7 +87,7 @@ class Graph():
             self.node_degree[e.org - 1] = self.node_degree[e.org - 1] + 1
             self.node_degree[e.dst - 1] = self.node_degree[e.dst - 1] + 1
 
-        self.bigM = functools.reduce(lambda acc, actual : acc if acc > actual else actual, self.node_degree)
+        self.bigM = functools.reduce(lambda acc, actual : acc if acc > actual else actual, self.node_degree, -1)
 
     def setNodeParity(self):
         if (len(self.node_degree) == 0) :

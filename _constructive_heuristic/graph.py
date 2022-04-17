@@ -33,13 +33,15 @@ class Graph():
 
     def setAllShortestPaths(self):
         self.distance_matrix = nx.floyd_warshall_numpy(self.G)
+
         
         for line in self.distance_matrix:
             for distance in line:
                 if (distance > self.highestDistance):
                     self.highestDistance = distance
         
-        # print(nx.floyd_warshall(self.G))
+        print(self.highestDistance)
+
 
     def getNodeById(self, node_id : int) -> Node:
         for n in self.nodes:
@@ -51,8 +53,8 @@ class Graph():
         self.setAllShortestPaths()
         self.setD_()
 
-    def addDepot(self, num_depot: int):
-        self.depots.append(Depot(num_depot))
+    def addDepot(self, initial_node: Node):
+        self.depots.append(Depot(initial_node))
 
     def addNode(self, node : Node, edge : Edge):
         if node.id not in list(map(lambda n: n.id, self.nodes)):
@@ -80,21 +82,23 @@ class Graph():
             self.addNode(edge.dst, edge)
             self.edges.append(edge)
 
-            self.G.add_edge(edge.org.id, edge.dst.id)
+            self.G.add_edge(edge.org.id, edge.dst.id, weight=edge.weight)
 
 
     def getShortestPathEdgeLen(self, edge : Edge, depot : int):
-        return min(nx.shortest_path_length(self.G, source=edge.org.id, target=depot),
-                    nx.shortest_path_length(self.G, source=edge.dst.id, target=depot))
+        return min(nx.shortest_path_length(self.G, source=edge.org.id, target=depot, weight="weight"),
+                    nx.shortest_path_length(self.G, source=edge.dst.id, target=depot, weight="weight"))
 
     def getNodeEdgesSortedByHeuristic(self, edge : Edge, depot_id : int)  -> list[Edge]:
-        # print("Border edge chosen: " + str(edge))
-        candidateEdges = edge.org.edges + edge.dst.edges
-        candidateEdges.sort(key=
-            lambda e : self.getShortestPathEdgeLen(e, depot_id)/self.highestDistance - e.demand/self.highestDemand - edge.previewNodesParityInDistrict(depot_id))
-        
-        candidateEdges = list(filter(lambda e: e.depot_id == -1 and e.id != edge.id, candidateEdges))
-        return candidateEdges
+        try:
+            candidateEdges = edge.org.edges + edge.dst.edges
+            candidateEdges.sort(key=
+                lambda e : self.getShortestPathEdgeLen(e, depot_id)/self.highestDistance - e.demand/self.highestDemand - edge.previewNodesParityInDistrict(depot_id)/2)
+            
+            candidateEdges = list(filter(lambda e: e.depot_id == -1 and e.id != edge.id, candidateEdges))
+            return candidateEdges
+        except:
+            print("Error getting sorted candidate edges by heuristic")
 
     def getNodeEdgesSortedByDemand(self, edge : Edge, depot_id : int)  -> list[Edge]:
         candidateEdges = edge.org.edges + edge.dst.edges
@@ -142,7 +146,7 @@ class Graph():
         return depots[0]
 
     def printGraph(self):
-        pos = nx.spring_layout(self.G, seed=225)
+        pos = nx.kamada_kawai_layout(self.G)
 
         for depot in self.depots:
             depot_edges = list(map(lambda e: (e.org.id, e.dst.id), depot.edges))
@@ -163,3 +167,13 @@ class Graph():
         print("Depot chosen before exception: " + str(actual_depot.initial_node.id))
         
         self.printGraph()
+
+    def depotsDistanceMean(self):
+        depot_nodes_list = list(map(lambda d: d.initial_node.id, self.depots))
+        total_distance = 0
+
+        for d in depot_nodes_list:
+            for i in range(depot_nodes_list.index(d) + 1, len(self.depots)):
+                total_distance = total_distance + nx.shortest_path_length(self.G, source=d, target=depot_nodes_list[i], weight="weight")
+
+        return total_distance/len(self.depots)

@@ -20,7 +20,7 @@ class Depot():
 
     def addInitialEdge(self):
         self.nodes.append(self.initial_node)
-        random_initial_edge = random.choice((self.nodes[0].edges))
+        random_initial_edge = random.choice(list(filter(lambda e: e.depot_id == -1, self.nodes[0].edges)))
         self.addBorderEdge(random_initial_edge)
 
     def addBorderEdge(self, edge: Edge):
@@ -28,26 +28,27 @@ class Depot():
         edge = self.addEdgeNodes(edge)
 
         self.total_demand = self.total_demand + edge.demand
-        
-        if (not self.border_edges):
-            self.border_edges.update({ edge.org.id: edge })
-        else:
-            if (edge.org.id in self.border_edges):
-
-                self.border_edges.update({ edge.dst.id: edge })
-
-                if (not edge.org.doIHaveEdgesWithNoDistrict()):
-                    self.border_edges.pop(edge.org.id)
-
-            else:
+        try:
+            if (not self.border_edges):
                 self.border_edges.update({ edge.org.id: edge })
+                self.border_edges.update({ edge.dst.id: edge })
+            else:
+                if (edge.org.id in self.border_edges):
 
-                if (not edge.dst.doIHaveEdgesWithNoDistrict() 
-                    and edge.dst.id in self.border_edges):
+                    self.border_edges.update({ edge.dst.id: edge })
 
-                    self.border_edges.pop(edge.dst.id)
+                    if (not edge.org.doIHaveEdgesWithNoDistrict()):
+                        self.border_edges.pop(edge.org.id)
 
-        # print("Updating border with edge " + str(edge.id) + " with demand " + str(edge.demand))
+                else:
+                    self.border_edges.update({ edge.org.id: edge })
+
+                    if (not edge.dst.doIHaveEdgesWithNoDistrict() 
+                        and edge.dst.id in self.border_edges):
+
+                        self.border_edges.pop(edge.dst.id)
+        except:
+            print("Error while updating border")
 
     def addEdgeNodes(self, edge : Edge):
         node_id_list = list(map(lambda n: n.id, self.nodes))
@@ -67,7 +68,6 @@ class Depot():
 
 
     def updateBorder(self, edges: list[Edge]):
-        # print("Updating depot " + str(self.initial_node.id) + " with " + str(len(edges)) + " edges")
         for e in edges:
             self.addBorderEdge(e)
 

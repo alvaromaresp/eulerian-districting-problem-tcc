@@ -16,7 +16,8 @@ def main():
 
     processFile(file, graph)
     
-    print(graph.G.nodes())
+    for n in graph.nodes:
+        print(n)
     model = SOTA_Model()
 
     model.execute(graph)

@@ -2,11 +2,9 @@ import time
 from graph import Graph
 class ConstructiveModel():
 
-    def execute(self, graph : Graph, chosen_execution = "heuristic"):
+    def execute(self, graph : Graph, chosen_execution = "heuristic", k = 1, tau_1 = 0.4):
 
-        k = 1
-        tau_1 = 0.4
-
+        start_time = time.time()
         while graph.areThereEdgesWithNoDistrict:
             try:
                 depot = graph.getWorstNonBalancedDistrict(tau_1)
@@ -23,10 +21,11 @@ class ConstructiveModel():
                     depot.updateBorder(choosenEdges[:k])
                 else:
                     depot.updateBorder(choosenEdges)
-                    # depot.updateBorder(choosenEdges)
                 graph.checklIfIfThereEdgeWithNoDistrict()
             except:
                 graph.runDiagnostics(tau_1, depot)
+
+        execution_time = time.time() - start_time
 
         for d in graph.depots:
             print("DEMAND IN DEPOT " + str(d.initial_node.id) + " is " + str(d.total_demand))
@@ -36,9 +35,20 @@ class ConstructiveModel():
         lost_parity = 0
         for n in graph.nodes:
             lost_parity = lost_parity + n.calculateLostParity()
-            if (n.calculateLostParity() == 1):
-                print("Node " + str(n.id) + " lost parity")
 
         print(str(lost_parity) + " nodes lost parity")
 
-        graph.printGraph()
+        
+        objective_function = 0
+
+        for d in graph.depots:
+            for e in d.edges:
+                objective_function = objective_function + graph.getShortestPathEdgeLen(e, d.initial_node.id)
+
+        print("Objective function: " + str(objective_function))
+
+        print("Depot distance mean: " + str(graph.depotsDistanceMean()))
+
+        # graph.printGraph()
+
+        return (lost_parity/len(graph.nodes), objective_function, graph.depotsDistanceMean(), execution_time)

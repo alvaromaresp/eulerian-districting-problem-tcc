@@ -8,8 +8,8 @@ class SOTA_Model():
     def execute(self, graph : Graph):
         d_ = functools.reduce(lambda acc, actual : acc + (actual.demand if actual.demand != None else 0), graph.edges, 0) / len(graph.depots)
 
-        tau_1 = 0.80
-        tau_2 = 0.80
+        tau_1 = 1
+        tau_2 = 1
 
         m = Model(sense=minimize, solver_name=CBC)
 

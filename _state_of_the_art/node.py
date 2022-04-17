@@ -11,6 +11,7 @@ class Node():
         self.degree = self.degree + 1
 
     def __str__(self):
+        self.printEdges()
         return (
             'Node: ' + str(self.id) + '\n' +
             '# of edges: ' + str(len(self.edges)) + '\n' +
