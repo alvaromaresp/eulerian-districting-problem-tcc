@@ -112,7 +112,8 @@ class Graph():
                 edgesWithEqualDemand.append(e)
         
         if (len(edgesWithEqualDemand) > 1):
-            return edgesWithEqualDemand.sort(key = lambda e : self.getShortestPathEdgeLen(e, depot_id))
+            edgesWithEqualDemand.sort(key = lambda e : self.getShortestPathEdgeLen(e, depot_id))
+            return edgesWithEqualDemand
         
         
         return candidateEdges
