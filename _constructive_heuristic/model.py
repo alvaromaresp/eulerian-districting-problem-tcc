@@ -33,14 +33,14 @@ class ConstructiveModel():
             print("DEMAND IN DEPOT " + str(d.initial_node.id) + " is " + str(d.total_demand))
 
         print("DEMAND MEAN = " + str(graph.d_))
-        
+
         lost_parity = 0
         for n in graph.nodes:
             lost_parity = lost_parity + n.calculateLostParity()
 
         print(str(lost_parity) + " nodes lost parity")
 
-        
+
         objective_function = 0
 
         for d in graph.depots:
