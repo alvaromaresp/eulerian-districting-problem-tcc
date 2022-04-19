@@ -6,12 +6,7 @@ from data_processing import processFile
 from graph import Graph
 
 def main():
-    file = None
-
-    # if (len(sys.argv) > 1):
-    #     file = open(sys.argv[1])
-    # else:
-    #     exit()
+    # file = None
 
     # while True:
     #     graph = Graph()
@@ -31,7 +26,7 @@ def main():
     for type in ["heuristic", "demand", "objective"]:
         result_file = open("result-" + type + "-" + str(time.time()) + ".txt", "a")
 
-        result_file.write("|V| - |E| - |D| -  tau_1  - \% Lost Parity - Obj. Function - Depots distance mean - t(s)")
+        result_file.write("FileName - |V| - |E| - |D| -  tau_1  - \% Lost Parity - Obj. Function - Depots distance mean - t(s)")
         result_file.write("\n")
         for i in instances:
             for t in tau_1_values:

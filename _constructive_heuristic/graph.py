@@ -89,26 +89,25 @@ class Graph():
         return min(nx.shortest_path_length(self.G, source=edge.org.id, target=depot, weight="weight"),
                     nx.shortest_path_length(self.G, source=edge.dst.id, target=depot, weight="weight"))
 
-    def getNodeEdgesSortedByHeuristic(self, edge : Edge, depot_id : int)  -> list[Edge]:
-        try:
-            candidateEdges = edge.org.edges + edge.dst.edges
-            candidateEdges.sort(key=
-                lambda e : self.getShortestPathEdgeLen(e, depot_id)/self.highestDistance - e.demand/self.highestDemand - edge.previewNodesParityInDistrict(depot_id)/2)
-            
-            candidateEdges = list(filter(lambda e: e.depot_id == -1 and e.id != edge.id, candidateEdges))
-            return candidateEdges
-        except:
-            print("Error getting sorted candidate edges by heuristic")
-
-    def getNodeEdgesSortedByDemand(self, edge : Edge, depot_id : int)  -> list[Edge]:
+    def getCandidateEdges(self, edge : Edge) -> list[Edge]:
         candidateEdges = edge.org.edges + edge.dst.edges
         candidateEdges = list(filter(lambda e: e.depot_id == -1 and e.id != edge.id, candidateEdges))
+        return candidateEdges
 
-        candidateEdges.sort(key=lambda e : e.demand, reverse=True)
+    def getNodeEdgesSortedByHeuristic(self, candidateEdges : list[Edge], depot_id : int)  -> list[Edge]:
+        localCandidateEdges = list(filter(lambda e: e.depot_id == -1, candidateEdges))
+        localCandidateEdges.sort(key=
+            lambda e : self.getShortestPathEdgeLen(e, depot_id)/self.highestDistance - e.demand/self.highestDemand - e.previewNodesParityInDistrict(depot_id)/2)
+        
+        return candidateEdges
+
+    def getNodeEdgesSortedByDemand(self, candidateEdges : list[Edge], depot_id : int)  -> list[Edge]:
+        localCandidateEdges = list(filter(lambda e: e.depot_id == -1, candidateEdges))
+        localCandidateEdges.sort(key=lambda e : e.demand, reverse=True)
 
         edgesWithEqualDemand = []
-        for e in candidateEdges:
-            if e.demand == candidateEdges[0].demand:
+        for e in localCandidateEdges:
+            if e.demand == localCandidateEdges[0].demand:
                 edgesWithEqualDemand.append(e)
         
         if (len(edgesWithEqualDemand) > 1):
@@ -116,15 +115,13 @@ class Graph():
             return edgesWithEqualDemand
         
         
-        return candidateEdges
+        return localCandidateEdges
 
-    def getNodeEdgesSortedByObjectiveFuncion(self, edge : Edge, depot_id : int)  -> list[Edge]:
-        candidateEdges = edge.org.edges + edge.dst.edges
-        candidateEdges = list(filter(lambda e: e.depot_id == -1 and e.id != edge.id, candidateEdges))
+    def getNodeEdgesSortedByObjectiveFuncion(self, candidateEdges : list[Edge], depot_id : int)  -> list[Edge]:
+        localCandidateEdges = list(filter(lambda e: e.depot_id == -1, candidateEdges))
+        localCandidateEdges.sort(key = lambda e : self.getShortestPathEdgeLen(e, depot_id))
 
-        candidateEdges.sort(key = lambda e : self.getShortestPathEdgeLen(e, depot_id))
-
-        return candidateEdges
+        return localCandidateEdges
 
     def areAllDemandsInsideD_Range(self, tau_1: float) -> bool:
         return functools.reduce(lambda acc, actual :

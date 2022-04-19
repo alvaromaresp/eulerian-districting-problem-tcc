@@ -10,12 +10,14 @@ class ConstructiveModel():
                 depot = graph.getWorstNonBalancedDistrict(tau_1)
                 choosenEdges = []
                 for key in depot.border_edges:
-                    if (chosen_execution == "heuristic"):
-                        choosenEdges = choosenEdges + graph.getNodeEdgesSortedByHeuristic(depot.border_edges[key], depot.initial_node.id)
-                    elif (chosen_execution == "demand"):
-                        choosenEdges = choosenEdges + graph.getNodeEdgesSortedByDemand(depot.border_edges[key], depot.initial_node.id)
-                    elif (chosen_execution == "objective"):
-                        choosenEdges = choosenEdges + graph.getNodeEdgesSortedByObjectiveFuncion(depot.border_edges[key], depot.initial_node.id)
+                    choosenEdges = choosenEdges + graph.getCandidateEdges(depot.border_edges[key])
+
+                if (chosen_execution == "heuristic"):
+                    choosenEdges = graph.getNodeEdgesSortedByHeuristic(choosenEdges, depot.initial_node.id)
+                elif (chosen_execution == "demand"):
+                    choosenEdges = graph.getNodeEdgesSortedByDemand(choosenEdges, depot.initial_node.id)
+                elif (chosen_execution == "objective"):
+                    choosenEdges = graph.getNodeEdgesSortedByObjectiveFuncion(choosenEdges, depot.initial_node.id)
 
                 if (k <= len(choosenEdges)):
                     depot.updateBorder(choosenEdges[:k])
