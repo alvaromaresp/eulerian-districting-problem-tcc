@@ -32,19 +32,19 @@ def main():
 
     model = ConstructiveModel()
     for i in instances:
+        depots = []
+        nodes_ids = [i + 1 for i in range(i.num_nodes)]
+        for _ in range(i.num_depots):
+            random.shuffle(nodes_ids)
+            node = nodes_ids.pop()
+
+            depots.append(node)
         for type in ["heuristic", "demand", "objective"]:
-            result_file = open("result-" + type + "-" + i.fileName + ".txt", "a")
+            result_file = open("result-" + type + "-" + str(time.time()) + ".txt", "a")
 
             result_file.write("FileName - |V| - |E| - |D| -  tau_1  - \% Lost Parity - Obj. Function - Depots distance mean - t(s)")
             result_file.write("\n")
 
-            depots = []
-            nodes_ids = [i + 1 for i in range(i.num_nodes)]
-            for _ in range(i.num_depots):
-                random.shuffle(nodes_ids)
-                node = nodes_ids.pop()
-
-                depots.append(node)
 
             for t in tau_1_values:
                 lost_parity = []
