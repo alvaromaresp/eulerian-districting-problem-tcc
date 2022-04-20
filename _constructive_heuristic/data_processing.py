@@ -4,18 +4,22 @@ from edge import Edge
 from node import Node
 from graph import Graph
 
-def processFile(file, graph: Graph, num_depots: int, weightless: bool = False) -> None:
+def processFile(file, graph: Graph, depots: list[int], weightless: bool = False) -> None:
 
     for line in file:
         processLine(line, graph, weightless)
 
-    for _ in range(num_depots):
-        node = random.choice(graph.nodes)
+    for d in depots:
+        node = graph.getNodeById(d)
+        graph.addDepot(node)
 
-        while node.id in list(map(lambda n: n.initial_node.id, graph.depots)):
-                node = random.choice(graph.nodes)
+    # for _ in range(num_depots):
+    #     node = random.choice(graph.nodes)
 
-        graph.addDepot(node)           
+    #     while node.id in list(map(lambda n: n.initial_node.id, graph.depots)):
+    #             node = random.choice(graph.nodes)
+
+    #     graph.addDepot(node)           
 
     # graph.addDepot(graph.getNodeById(68))
     # graph.addDepot(graph.getNodeById(69))

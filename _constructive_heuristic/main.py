@@ -1,3 +1,4 @@
+import random
 import numpy
 import time
 from instances import instanciate, Instance
@@ -9,10 +10,18 @@ def main():
     # file = None
 
     # while True:
+        
     #     graph = Graph()
-    #     instance = Instance("..\Instances\lpr\Lpr-b-02.txt", 2)
+    #     instance = Instance("..\Instances\lpr\Lpr-b-02.txt", 2, 53)
+    #     depots = []
+    #     nodes_ids = [i + 1 for i in range(instance.num_nodes)]
+    #     for _ in range(instance.num_depots):
+            # random.shuffle(nodes_ids)
+            # node = nodes_ids.pop()
+            
+            # depots.append(node)
     #     file = open(instance.fileName)
-    #     processFile(file, graph, instance.num_depots)
+    #     processFile(file, graph, depots)
     #     model = ConstructiveModel()
     #     model.execute(graph, tau_1=1)
     instances = instanciate()
@@ -29,6 +38,14 @@ def main():
         result_file.write("FileName - |V| - |E| - |D| -  tau_1  - \% Lost Parity - Obj. Function - Depots distance mean - t(s)")
         result_file.write("\n")
         for i in instances:
+            depots = []
+            nodes_ids = [i + 1 for i in range(i.num_nodes)]
+            for _ in range(i.num_depots):
+                random.shuffle(nodes_ids)
+                node = nodes_ids.pop()
+                
+                depots.append(node)
+
             for t in tau_1_values:
                 lost_parity = []
                 obj_func = []
@@ -37,7 +54,7 @@ def main():
                 for j in range(10):
                     graph = Graph()
                     file = open(i.fileName)
-                    processFile(file, graph, i.num_depots)
+                    processFile(file, graph, depots)
                     result = model.execute(graph, tau_1=t, chosen_execution=type)
                     lost_parity.append(result[0])
                     obj_func.append(result[1])
