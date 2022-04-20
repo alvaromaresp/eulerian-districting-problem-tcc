@@ -19,7 +19,7 @@ def processFile(file, graph: Graph, depots: list[int], weightless: bool = False)
     #     while node.id in list(map(lambda n: n.initial_node.id, graph.depots)):
     #             node = random.choice(graph.nodes)
 
-    #     graph.addDepot(node)           
+    #     graph.addDepot(node)
 
     # graph.addDepot(graph.getNodeById(68))
     # graph.addDepot(graph.getNodeById(69))
@@ -27,7 +27,7 @@ def processFile(file, graph: Graph, depots: list[int], weightless: bool = False)
     # graph.addDepot(graph.getNodeById(graph.num_nodes - 1))
 
     setDepotColors(graph)
-    
+
     graph.prepareData()
 
 def processLine(line : str, graph: Graph, weightless: bool):

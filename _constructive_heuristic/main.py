@@ -29,6 +29,14 @@ def main():
 
     tau_1_values = [1, 0.75, 0.5, 0.25, 0.1]
 
+    timestamp =  str(time.time())
+    result_demand_file = open("results/result-demand-" + timestamp + ".txt", "a")
+    result_heuristic_file = open("results/result-heuristic-" + timestamp + ".txt", "a")
+    result_objective_file = open("results/result-objective-" + timestamp + ".txt", "a")
+
+    result_demand_file.write("FileName - |V| - |E| - |D| -  tau_1  - \% Lost Parity - Obj. Function - Depots distance mean - t(s)")
+    result_heuristic_file.write("FileName - |V| - |E| - |D| -  tau_1  - \% Lost Parity - Obj. Function - Depots distance mean - t(s)")
+    result_objective_file.write("FileName - |V| - |E| - |D| -  tau_1  - \% Lost Parity - Obj. Function - Depots distance mean - t(s)")
 
     model = ConstructiveModel()
     for i in instances:
@@ -40,11 +48,13 @@ def main():
 
             depots.append(node)
         for type in ["heuristic", "demand", "objective"]:
-            result_file = open("result-" + type + "-" + str(time.time()) + ".txt", "a")
-
-            result_file.write("FileName - |V| - |E| - |D| -  tau_1  - \% Lost Parity - Obj. Function - Depots distance mean - t(s)")
-            result_file.write("\n")
-
+            result_file = None
+            if (type == "heuristic"):
+                result_file = result_heuristic_file
+            elif (type == "demand"):
+                result_file = result_demand_file
+            elif (type == "objective"):
+                result_file = result_objective_file
 
             for t in tau_1_values:
                 lost_parity = []

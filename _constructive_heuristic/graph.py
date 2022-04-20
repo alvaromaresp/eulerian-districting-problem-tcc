@@ -34,12 +34,12 @@ class Graph():
     def setAllShortestPaths(self):
         self.distance_matrix = nx.floyd_warshall_numpy(self.G)
 
-        
+
         for line in self.distance_matrix:
             for distance in line:
                 if (distance > self.highestDistance):
                     self.highestDistance = distance
-        
+
         print(self.highestDistance)
 
 
@@ -64,7 +64,7 @@ class Graph():
                 if i.id == node.id:
                     for e in node.edges:
                         i.addEdge(e)
-                      
+
                     if i.id == edge.org.id:
                         edge.org = i
                     else:
@@ -98,7 +98,7 @@ class Graph():
         localCandidateEdges = list(filter(lambda e: e.depot_id == -1, candidateEdges))
         localCandidateEdges.sort(key=
             lambda e : self.getShortestPathEdgeLen(e, depot_id)/self.highestDistance - e.demand/self.highestDemand - e.previewNodesParityInDistrict(depot_id)/2)
-        
+
         return candidateEdges
 
     def getNodeEdgesSortedByDemand(self, candidateEdges : list[Edge], depot_id : int)  -> list[Edge]:
@@ -109,12 +109,12 @@ class Graph():
         for e in localCandidateEdges:
             if e.demand == localCandidateEdges[0].demand:
                 edgesWithEqualDemand.append(e)
-        
+
         if (len(edgesWithEqualDemand) > 1):
             edgesWithEqualDemand.sort(key = lambda e : self.getShortestPathEdgeLen(e, depot_id))
             return edgesWithEqualDemand
-        
-        
+
+
         return localCandidateEdges
 
     def getNodeEdgesSortedByObjectiveFuncion(self, candidateEdges : list[Edge], depot_id : int)  -> list[Edge]:
@@ -139,7 +139,7 @@ class Graph():
             self.depots.sort(key=lambda d : d.total_demand)
         else:
             self.depots.sort(key=lambda d : self.d_ * (1 + tau_1) - d.total_demand, reverse=True) ## MAIOR DISTÂNCIA DO UPPER BOUND
-        
+
         depots = list(filter(lambda d : d.canMyBorderIncrease(), self.depots))
         return depots[0]
 
@@ -163,7 +163,7 @@ class Graph():
         print("Depots demands: ")
         print(list(map(lambda d : d.total_demand, self.depots)))
         print("Depot chosen before exception: " + str(actual_depot.initial_node.id))
-        
+
         self.printGraph()
 
     def depotsDistanceMean(self):
